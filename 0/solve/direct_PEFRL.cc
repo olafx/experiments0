@@ -120,7 +120,7 @@ int main(int argc, char **argv)
      t_memoryspace = H5Screate_simple(1,  t_dims_chunk, NULL);
 
     // lambda for writing
-    auto write = [&](size_t t)
+    auto write = [&](const size_t t)
     {   // write positions and velocities
         filespace = H5Dget_space(pv_dataset);
         status    = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pv_offset,
@@ -129,7 +129,6 @@ int main(int argc, char **argv)
                         filespace, H5P_DEFAULT, data_pv);
         pv_offset[0]++;
         // write time
-        *data_t = t*dt;
         filespace = H5Dget_space(t_dataset);
         status    = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, t_offset,
                         NULL, t_dims_chunk, NULL);
@@ -141,7 +140,7 @@ int main(int argc, char **argv)
 
     // write initial condition
     status = H5Dset_extent(pv_dataset, pv_dims);
-    status = H5Dset_extent(t_dataset, t_dims);
+    status = H5Dset_extent( t_dataset,  t_dims);
     write(0);
 
 /******************************************************************************/
@@ -150,15 +149,11 @@ int main(int argc, char **argv)
     constexpr double b = -0.2123418310626054;
     constexpr double c = -0.06626458266981849;
 
-    auto pos = [&](const double x)
-    {   for (size_t i = 0; i < n; i++)
-        {   data_p[3*i  ] += x*data_v[3*i  ]*dt;
-            data_p[3*i+1] += x*data_v[3*i+1]*dt;
-            data_p[3*i+2] += x*data_v[3*i+2]*dt;
-        }
-    };
-    auto vel = [&](const double y)
-    {   for (size_t i = 0; i < n; i++)
+    // velocity and position updaters
+    auto vel = [&](const double x)
+    {
+        #pragma omp parallel for
+        for (size_t i = 0; i < n; i++)
         {   double a1 = 0;
             double a2 = 0;
             double a3 = 0;
@@ -174,15 +169,22 @@ int main(int argc, char **argv)
                     a3 += c*b3;
                 }
             }
-            data_v[3*i  ] += y*a1*dt;
-            data_v[3*i+1] += y*a2*dt;
-            data_v[3*i+2] += y*a3*dt;
+            data_v[3*i  ] += x*a1*dt;
+            data_v[3*i+1] += x*a2*dt;
+            data_v[3*i+2] += x*a3*dt;
+        }
+    };
+    auto pos = [&](const double y)
+    {   for (size_t i = 0; i < n; i++)
+        {   data_p[3*i  ] += y*data_v[3*i  ]*dt;
+            data_p[3*i+1] += y*data_v[3*i+1]*dt;
+            data_p[3*i+2] += y*data_v[3*i+2]*dt;
         }
     };
 
     // time steps
     for (size_t t = 1; t <= N; t++)
-    {
+    {   // 5 position updates, 4 velocity updates
         pos(a);
         vel(.5-b);
         pos(c);
@@ -192,10 +194,11 @@ int main(int argc, char **argv)
         pos(c);
         vel(.5-b);
         pos(a);
-
-        // process
+        // write
         if (t % N_s == 0)
+        {   *data_t = t*dt;
             write(t);
+        }
     }
 
 /******************************************************************************/

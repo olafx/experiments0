@@ -9,7 +9,6 @@
 # shortcomings of basic rejection sampling, and rejection sampling as a whole;
 # more on this later.
 
-import sys
 import numpy as np
 from scipy import special
 import matplotlib.pyplot as plt

@@ -7,7 +7,6 @@
 # target Student-t and has a simple quantile function, so sampling is easy; just
 # run a uniform probability through the quantile function.
 
-import sys
 import numpy as np
 from scipy import special
 import matplotlib.pyplot as plt
