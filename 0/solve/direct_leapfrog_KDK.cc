@@ -158,8 +158,8 @@ int main(int argc, char **argv)
                 {   const double b1 = data_p[3*j  ]-data_p[3*i  ];
                     const double b2 = data_p[3*j+1]-data_p[3*i+1];
                     const double b3 = data_p[3*j+2]-data_p[3*i+2];
-                    double c = 1/sqrt(b1*b1+b2*b2+b3*b3+e2);
-                    c = c*c*c;
+                    double c = 1/(b1*b1+b2*b2+b3*b3+e2);
+                    c *= sqrt(c);
                     a1 += c*b1;
                     a2 += c*b2;
                     a3 += c*b3;
