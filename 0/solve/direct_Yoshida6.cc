@@ -150,14 +150,14 @@ int main(int argc, char **argv)
     constexpr double w1 = -1.17767998417887;
     constexpr double w0 =  1-2*(w1+w2+w3);
 
-    constexpr double c8 = .5*(w3   );
+    constexpr double c8 = .5*(w3);
     constexpr double c7 = .5*(w2+w3);
     constexpr double c6 = .5*(w1+w2);
     constexpr double c5 = .5*(w0+w1);
     constexpr double c4 = .5*(w0+w1);
     constexpr double c3 = .5*(w1+w2);
     constexpr double c2 = .5*(w2+w3);
-    constexpr double c1 = .5*(w3   );
+    constexpr double c1 = .5*(w3);
 
     constexpr double d7 = w3;
     constexpr double d6 = w2;
