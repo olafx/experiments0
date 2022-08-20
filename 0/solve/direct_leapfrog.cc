@@ -178,7 +178,7 @@ int main(int argc, char **argv)
         }
     };
 
-    // first time step (has descynchronization)
+    // first time step (has desynchronization)
     vel(.5);
     pos(1);
     if (1 % N_s == 0)
