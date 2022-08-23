@@ -1,9 +1,20 @@
+/*
+force evaluation:
+    direct
+integration:
+    leapfrog (KD)
+*/
+
 #include <cstdio>
+#include <cstdlib>
 #include <cmath>
 #include <hdf5.h>
 
 int main(int argc, char **argv)
 {
+    if (argc != 7)
+        return EXIT_FAILURE;
+
     // HDF5 settings
     char *name_file_ic = argv[1];
     char *name_file    = argv[2];
@@ -13,10 +24,11 @@ int main(int argc, char **argv)
     size_t N_s; // store every this many steps
     double dt;  // timestep
     double e2;  // softening epsilon squared
-    sscanf(argv[3], "%zu", &N);
-    sscanf(argv[4], "%zu", &N_s);
-    sscanf(argv[5], "%lf", &dt);
-    sscanf(argv[6], "%lf", &e2);
+    if (sscanf(argv[3], "%zu", &N)   == 0 ||
+        sscanf(argv[4], "%zu", &N_s) == 0 ||
+        sscanf(argv[5], "%lf", &dt)  == 0 ||
+        sscanf(argv[6], "%lf", &e2)  == 0)
+        return EXIT_FAILURE;
 
 /******************************************************************************/
 

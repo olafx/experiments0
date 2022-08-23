@@ -20,7 +20,7 @@ total_vel  = np.sqrt(np.sum(total_vel**2, axis=1))
 vel2       = np.sum(vel**2, axis=2)
 kin_energy = .5*(np.sum(vel2, axis=1))
 
-print('maximum vel', np.sqrt(np.max(vel2)))
+print('max vel', np.sqrt(np.max(vel2)))
 
 plt.figure('total kinetic energy')
 plt.xlabel('time [a.u.]')

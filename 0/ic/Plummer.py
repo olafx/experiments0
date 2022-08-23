@@ -1,7 +1,12 @@
+# sampling of King model by King (1966)
+
 import sys
 import numpy as np
 import h5py
 import matplotlib.pyplot as plt
+
+if (len(sys.argv) != 5):
+    raise Exception('wrong number of command-line arguments')
 
 filename  = sys.argv[1]
 n         = int(sys.argv[2])   # objects

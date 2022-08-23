@@ -1,3 +1,3 @@
 # 2
 
-Joukowsky airfoil.
+Joukowsky airfoil by Zhukovsky (1910).

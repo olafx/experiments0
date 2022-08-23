@@ -1,6 +1,11 @@
+# elliptical 2-body initial condition, starting at apoapsis, in 0-momentum frame
+
 import sys
 import numpy as np
 import h5py
+
+if len(sys.argv) != 4:
+    raise Exception('wrong number of command-line arguments')
 
 filename = sys.argv[1]
 e = float(sys.argv[2]) # orbital eccentricity
@@ -17,5 +22,5 @@ pos_vel[1,0,:] = 0, -.5*v, 0
 pos_vel[1,1,:] = 0,  .5*v, 0
 
 fp = h5py.File(sys.argv[1], 'w')
-fp.create_dataset("pos,vel", data=pos_vel)
+fp.create_dataset('pos,vel', data=pos_vel)
 fp.close()
