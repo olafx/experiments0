@@ -2,8 +2,7 @@
 force evaluation:
     direct
 integration:
-    Position Extended Forest-Ruth Like aka PEFRL by Omelyan, Mryglod, Folk
-    (2008)
+    Position Extended Forest-Ruth Like aka PEFRL by Omelyan, Mryglod, Folk (2008)
 */
 
 #include <cstdio>
@@ -47,7 +46,8 @@ int main(int argc, char **argv)
 
     // physics data
     double *data;
-    size_t n; // # objects
+    size_t n; // objects
+    double t; // time
 
     // physics convenience pointers
     double *data_pv;
@@ -65,17 +65,16 @@ int main(int argc, char **argv)
     n = ic_dims[1];
 
     // physics data allocation
-    data = new double[6*n+1];
+    data    = new double[6*n];
 
-    // physics convenience pointers assignment
+    // convenience pointers assignment
     data_pv = data;
     data_p  = data;
     data_v  = data+3*n;
-    data_t  = data+6*n;
+    data_t  = &t;
 
     // reading initial condition
-    status = H5Dread(ic_dataset, H5T_NATIVE_DOUBLE, dataspace, dataspace,
-                 H5P_DEFAULT, data_pv);
+    status = H5Dread(ic_dataset, H5T_NATIVE_DOUBLE, dataspace, dataspace, H5P_DEFAULT, data_pv);
 
     // closing initial condition file
     status = H5Dclose(ic_dataset);
@@ -88,7 +87,7 @@ int main(int argc, char **argv)
     file = H5Fcreate(name_file, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     // dims setup
-    pv_dims[0]       = N / N_s + 1;
+    pv_dims[0]       = N/N_s+1;
     pv_dims[1]       = 2;
     pv_dims[2]       = n;
     pv_dims[3]       = 3;
@@ -100,28 +99,26 @@ int main(int argc, char **argv)
     pv_dims_chunk[1] = 2;
     pv_dims_chunk[2] = n;
     pv_dims_chunk[3] = 3;
-     t_dims[0]       = N / N_s + 1;
+     t_dims[0]       = N/N_s+1;
      t_dims_max[0]   = H5S_UNLIMITED;
      t_dims_chunk[0] = 1;
 
     // create extendible, chunked dataset for positions and velocities
-    constexpr double fill = 0;
+    constexpr double fill = NAN;
     dataspace  = H5Screate_simple(4, pv_dims, pv_dims_max);
     cparms     = H5Pcreate(H5P_DATASET_CREATE);
     status     = H5Pset_chunk(cparms, 4, pv_dims_chunk);
     status     = H5Pset_fill_value(cparms, H5T_NATIVE_DOUBLE, &fill);
-    pv_dataset = H5Dcreate2(file, "pos,vel", H5T_NATIVE_DOUBLE, dataspace,
-                     H5P_DEFAULT, cparms, H5P_DEFAULT);
+    pv_dataset = H5Dcreate2(file, "pos,vel", H5T_NATIVE_DOUBLE, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
 
     // create extendible, chunked dataset for time
     dataspace = H5Screate_simple(1, t_dims, t_dims_max);
     cparms    = H5Pcreate(H5P_DATASET_CREATE);
     status    = H5Pset_chunk(cparms, 1, t_dims_chunk);
     status    = H5Pset_fill_value(cparms, H5T_NATIVE_DOUBLE, &fill);
-    t_dataset = H5Dcreate2(file, "time", H5T_NATIVE_DOUBLE, dataspace,
-                    H5P_DEFAULT, cparms, H5P_DEFAULT);
+    t_dataset = H5Dcreate2(file, "time", H5T_NATIVE_DOUBLE, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
 
-    // create offsets for writing
+    // assign offsets for writing
     pv_offset[0] = 0;
     pv_offset[1] = 0;
     pv_offset[2] = 0;
@@ -132,28 +129,26 @@ int main(int argc, char **argv)
     pv_memoryspace = H5Screate_simple(4, pv_dims_chunk, NULL);
      t_memoryspace = H5Screate_simple(1,  t_dims_chunk, NULL);
 
-    // lambda for writing
-    auto write = [&](const size_t t)
+    // writer
+    auto write = [&](const size_t i)
     {   // write positions and velocities
         filespace = H5Dget_space(pv_dataset);
-        status    = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pv_offset,
-                        NULL, pv_dims_chunk, NULL);
-        status    = H5Dwrite(pv_dataset, H5T_NATIVE_DOUBLE, pv_memoryspace,
-                        filespace, H5P_DEFAULT, data_pv);
-        pv_offset[0]++;
+        status    = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pv_offset, NULL, pv_dims_chunk, NULL);
+        status    = H5Dwrite(pv_dataset, H5T_NATIVE_DOUBLE, pv_memoryspace, filespace, H5P_DEFAULT, data_pv);
         // write time
         filespace = H5Dget_space(t_dataset);
-        status    = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, t_offset,
-                        NULL, t_dims_chunk, NULL);
-        status    = H5Dwrite(t_dataset, H5T_NATIVE_DOUBLE, t_memoryspace,
-                        filespace, H5P_DEFAULT, data_t);
-        t_offset[0]++;
-        printf("%zu/%zu\n", t, N);
+        status    = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, t_offset, NULL, t_dims_chunk, NULL);
+        status    = H5Dwrite(t_dataset, H5T_NATIVE_DOUBLE, t_memoryspace, filespace, H5P_DEFAULT, data_t);
+
+        pv_offset[0]++;
+         t_offset[0]++;
+        printf("%zu/%zu\n", i, N);
     };
 
     // write initial condition
     status = H5Dset_extent(pv_dataset, pv_dims);
     status = H5Dset_extent( t_dataset,  t_dims);
+    t = 0;
     write(0);
 
 /******************************************************************************/
@@ -162,9 +157,9 @@ int main(int argc, char **argv)
     constexpr double b = -0.2123418310626054;
     constexpr double c = -0.06626458266981849;
 
-    // velocity and position updaters
-    auto vel = [&](const double x)
-    {
+    // velocity updater
+    auto kick = [&](const double a)
+    {   
         #pragma omp parallel for
         for (size_t i = 0; i < n; i++)
         {   double a1 = 0;
@@ -172,45 +167,48 @@ int main(int argc, char **argv)
             double a3 = 0;
             for (size_t j = 0; j < n; j++)
             {   if (i != j)
-                {   const double b1 = data_p[3*j  ]-data_p[3*i  ];
-                    const double b2 = data_p[3*j+1]-data_p[3*i+1];
-                    const double b3 = data_p[3*j+2]-data_p[3*i+2];
-                    double c = 1/(b1*b1+b2*b2+b3*b3+e2);
+                {   double b1 = data_p[3*j  ]-data_p[3*i  ];
+                    double b2 = data_p[3*j+1]-data_p[3*i+1];
+                    double b3 = data_p[3*j+2]-data_p[3*i+2];
+                    double c  = 1/(b1*b1+b2*b2+b3*b3+e2);
                     c *= sqrt(c);
                     a1 += c*b1;
                     a2 += c*b2;
                     a3 += c*b3;
                 }
             }
-            data_v[3*i  ] += x*a1*dt;
-            data_v[3*i+1] += x*a2*dt;
-            data_v[3*i+2] += x*a3*dt;
+            data_v[3*i  ] += a*a1*dt;
+            data_v[3*i+1] += a*a2*dt;
+            data_v[3*i+2] += a*a3*dt;
         }
     };
-    auto pos = [&](const double y)
-    {   for (size_t i = 0; i < n; i++)
-        {   data_p[3*i  ] += y*data_v[3*i  ]*dt;
-            data_p[3*i+1] += y*data_v[3*i+1]*dt;
-            data_p[3*i+2] += y*data_v[3*i+2]*dt;
+
+    // position updater
+    auto drift = [&](const double a)
+    {
+        #pragma omp parallel for
+        for (size_t i = 0; i < n; i++)
+        {   data_p[3*i  ] += a*data_v[3*i  ]*dt;
+            data_p[3*i+1] += a*data_v[3*i+1]*dt;
+            data_p[3*i+2] += a*data_v[3*i+2]*dt;
         }
     };
 
     // time steps
-    for (size_t t = 1; t <= N; t++)
-    {   // 5 position updates, 4 velocity updates
-        pos(a);
-        vel(.5-b);
-        pos(c);
-        vel(b);
-        pos(1-2*(a+c));
-        vel(b);
-        pos(c);
-        vel(.5-b);
-        pos(a);
+    for (size_t i = 1; i <= N; i++)
+    {   drift(a);
+        kick(.5-b);
+        drift(c);
+        kick(b);
+        drift(1-2*(a+c));
+        kick(b);
+        drift(c);
+        kick(.5-b);
+        drift(a);
         // write
-        if (t % N_s == 0)
-        {   *data_t = t*dt;
-            write(t);
+        if (i % N_s == 0)
+        {   t = i*dt;
+            write(i);
         }
     }
 
@@ -227,5 +225,5 @@ int main(int argc, char **argv)
     H5Fclose(file);
 
     // physics data deallocation
-    delete[] data_pv;
+    delete[] data;
 }

@@ -14,19 +14,10 @@ time = fp['time'][:]
 
 fp.close()
 
-# distance
 dist     = np.linalg.norm(pos[:,0,:]-pos[:,1,:], axis=1)
 dist_min = np.min(dist)
 dist_max = np.max(dist)
 
-# analysis via numerical velocity
-# dt            = np.diff(time)
-# vel_num       = np.diff(pos, axis=0)/dt[:,None,None]
-# total_vel_num = np.linalg.norm(np.sum(vel_num, axis=1), axis=1)
-# vel2_num      = np.sum(vel_num**2, axis=2)
-# energy_num    = .5*(np.sum(vel2_num, axis=1))-1/dist[1:]
-
-# analysis via exact velocity
 total_vel  = np.sum(vel, axis=1)
 total_vel  = np.sqrt(np.sum(total_vel**2, axis=1))
 vel2       = np.sum(vel**2, axis=2)
