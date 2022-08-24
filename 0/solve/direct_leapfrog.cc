@@ -65,7 +65,7 @@ int main(int argc, char **argv)
     n = ic_dims[1];
 
     // physics data allocation
-    data    = new double[6*n];
+    data = new double[6*n];
 
     // convenience pointers assignment
     data_pv = data;
