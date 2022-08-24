@@ -81,7 +81,7 @@ An n-body gravity solver has 2 basic components: a force evaluator, and an integ
             -   8th order, symplectic, 15 force evaluations
     -   adaptivity
         -   techniques
-            -   implicit time-symmetrized by Hut, Makino, McMillan (1995)
-            -   a technique by Quinn, Katz, Stadel, Lake (1997)
+            -   implicit, time-symmetrized technique by Hut, Makino, McMillan (1995)
+            -   DSKD and SDKD techniques by Quinn, Katz, Stadel, Lake (1997)
         -   mechanisms
             -   dynamical time via enclosed density
