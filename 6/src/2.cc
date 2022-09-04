@@ -78,7 +78,6 @@ bool brent(double &root, const double x1, const double x2, const double dx, cons
         // verify.
         dx1 = 2*DBL_EPSILON*abs(b)+.5*dx;
         xm = .5*(c-b);
-
         if (abs(xm) <= dx1 || fb == 0)
         {   root = b;
             return true;
@@ -116,8 +115,8 @@ bool brent(double &root, const double x1, const double x2, const double dx, cons
         if (abs(d) > dx1)
             b += d;
         else
-            b += abs(dx1)*(xm < 0 ? -1 : 1); // potential mistake here
-        fb = f(b); // potential mistake here
+            b += abs(dx1)*(xm < 0 ? -1 : 1);
+        fb = f(b);
     }
     return false;
 }
