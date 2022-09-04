@@ -8,6 +8,7 @@ integration:
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include <cstring>
 #include <hdf5.h>
 
 int main(int argc, char **argv)
@@ -130,6 +131,7 @@ int main(int argc, char **argv)
      t_memoryspace = H5Screate_simple(1,  t_dims_chunk, NULL);
 
     // writer
+    int N_len = strlen(argv[3]);
     auto write = [&](const size_t i)
     {   // write positions and velocities
         filespace = H5Dget_space(pv_dataset);
@@ -142,7 +144,7 @@ int main(int argc, char **argv)
 
         pv_offset[0]++;
          t_offset[0]++;
-        printf("%zu/%zu\n", i, N);
+        printf("%*zu/%zu\n", N_len, i, N);
     };
 
     // write initial condition
@@ -190,17 +192,9 @@ int main(int argc, char **argv)
         }
     };
 
-    // first time step (has desynchronization)
-    kick(.5);
-    drift(1);
-    if (1 % N_s == 0)
-    {   t = dt;
-        write(1);
-    }
-
-    // next time steps
-    for (size_t i = 2; i <= N; i++)
-    {   kick(1);
+    // time steps
+    for (size_t i = 1; i <= N; i++)
+    {   kick(i == 1 ? .5 : 1); // first step has desynchronization
         drift(1);
         // synchronize, write, desynchronize
         if (i % N_s == 0)

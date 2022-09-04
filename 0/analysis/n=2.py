@@ -10,7 +10,7 @@ fp = h5py.File(filename, 'r')
 n    = fp['pos,vel'].shape[2]
 pos  = fp['pos,vel'][:,0,:,:]
 vel  = fp['pos,vel'][:,1,:,:]
-time = fp['time'][:]
+time = fp['time'][...]
 
 fp.close()
 
@@ -27,7 +27,7 @@ energy     = kin_energy+pot_energy
 total_vel_max = np.max(total_vel)
 energy_min    = np.min(energy)
 energy_max    = np.max(energy)
-energy_norm = (energy_max-energy)/energy_max
+energy_norm   = (energy_max-energy)/energy_max
 
 print('min distance', dist_min)
 print('max distance', dist_max)

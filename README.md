@@ -25,3 +25,15 @@ Monte Carlo sampling.
 ## 4
 
 Raytracing.
+
+## 5
+
+Mandelbrot.
+
+## 6
+
+Solving nonlinear equations.
+
+## 7
+
+Fourier and wavelet transformation.

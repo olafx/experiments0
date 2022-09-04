@@ -12,6 +12,10 @@
 #      order, it'd be better to make r_v a (n, 2) instead of (2, n). so many
 #      many points of optimization. 1 million objects sampled per minute would
 #      be acceptable. right now it's maybe 20k.
+# TODO I think you should use a different type of interpolation, and then solve
+#      r0 numerically. this is more elegant imo. this should just boil down to
+#      a nonlinear equation root finder, which is something I don't do much, but
+#      scipy or numpy can definitely easily do.
 
 import sys
 import numpy as np
@@ -63,7 +67,6 @@ r0 = sol.t[i-1]-sol.y[0,i-1]*r_max/N/(sol.y[0,i]-sol.y[0,i-1])
 
 # standard rejection sampling
 i = 0
-attempts = 0
 while i < n:
     r = rng.uniform(0, r0)
     # TODO v is wrong here, need to use analytical max v
@@ -72,7 +75,6 @@ while i < n:
     if p < r**2*v**2*np.exp(-2*j**2*(V_interp(r)-V0))*(np.exp(-j**2*v**2)-np.exp(j**2*2*V_interp(r))):
         r_v[:,i] = r, v
         i += 1
-    attempts += 1
 
 # random spatially isentropic spherical angles
 r_theta = np.arccos(rng.uniform(-1, 1, n))
@@ -88,7 +90,6 @@ def spherical_to_Cartesian(r, theta, phi):
 pos_vel[0] = np.transpose(spherical_to_Cartesian(r_v[0], r_theta, r_phi))
 pos_vel[1] = np.transpose(spherical_to_Cartesian(r_v[1], v_theta, v_phi))
 
-# storage
-fp = h5py.File(filename, 'w')
-fp.create_dataset('pos,vel', data=pos_vel)
-fp.close()
+# writing
+with fp as h5py.File(filename, 'w'):
+    fp.create_dataset('pos,vel', data=pos_vel)
