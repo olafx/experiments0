@@ -22,5 +22,6 @@ pos_vel[1,0,:] = 0, -.5*v, 0
 pos_vel[1,1,:] = 0,  .5*v, 0
 
 # writing
-with fp as h5py.File(filename, 'w'):
-    fp.create_dataset('pos,vel', data=pos_vel)
+fp = h5py.File(filename, 'w')
+fp.create_dataset('pos,vel', data=pos_vel)
+fp.close()

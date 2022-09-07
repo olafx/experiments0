@@ -91,5 +91,6 @@ pos_vel[0] = np.transpose(spherical_to_Cartesian(r_v[0], r_theta, r_phi))
 pos_vel[1] = np.transpose(spherical_to_Cartesian(r_v[1], v_theta, v_phi))
 
 # writing
-with fp as h5py.File(filename, 'w'):
-    fp.create_dataset('pos,vel', data=pos_vel)
+fp = h5py.File(filename, 'w')
+fp.create_dataset('pos,vel', data=pos_vel)
+fp.close()
