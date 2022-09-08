@@ -182,7 +182,7 @@ int main(int argc, char **argv)
         return a/r3;
     };
 
-    // dynamic time of object i via enclosed density
+    // dynamical time of object i via enclosed density
     auto dyn_time = [&](const size_t i)
     {   return eta/sqrt(enc_density(i));
     };
