@@ -93,7 +93,7 @@ void f_df_d2f(const double *const c, const double x, double &f, double &df, doub
     g_dg_d2g<n>(c, x, g, dg, d2g);
     f   = sin(.1*x)*g;
     df  = .1*cos(.1*x)*g+sin(.1*x)*dg;
-    d2f = .2*cos(.1*x)*dg+sin(.1*x)*(d2g-0.01*g);
+    d2f = .2*cos(.1*x)*dg+sin(.1*x)*(d2g-.01*g);
 }
 
 int main()

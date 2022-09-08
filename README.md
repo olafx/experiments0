@@ -28,7 +28,7 @@ Raytracing.
 
 ## 5
 
-Mandelbrot.
+Rendering related to mathematical maps.
 
 ## 6
 
@@ -37,3 +37,15 @@ Solving nonlinear equations.
 ## 7
 
 Fourier and wavelet transformation.
+
+## 8
+
+Evaluating arbitrary equations to a required precision.
+
+## 9
+
+Prime sieves.
+
+## 10
+
+Lyapunov fractal rendering.
