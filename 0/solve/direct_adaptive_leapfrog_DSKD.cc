@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     hsize_t  t_dims[1],  t_dims_max[1],  t_dims_chunk[1],  t_offset[1];
 
     // physics data
-    using layer_type = uint16_t; // depending on problem, maybe 8 or 32
+    using layer_type = uint16_t; // 8 should probably be fine too, 2^8 orders is a lot, but 2^16 is always enough for doubles
     void *data;
     size_t n; // objects
     double t; // time
