@@ -45,7 +45,3 @@ Evaluating arbitrary equations to a required precision.
 ## 9
 
 Prime sieves.
-
-## 10
-
-Lyapunov fractal rendering.
