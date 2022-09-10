@@ -13,7 +13,7 @@ int main()
 
     {
     constexpr range_t range {{-2, 1}, {-1, 1}}; // -2 to 1, -i to i
-    constexpr int2 res {3840, 2560};
+    constexpr size_t2 res {3840, 2560};
     constexpr size_t max_i = 1e3;
     constexpr int color_type = PNG_COLOR_TYPE_RGB;
     constexpr int bytes = 3;
@@ -32,7 +32,7 @@ int main()
     constexpr double2 c {0.001643721971153, -0.822467633298876};
     constexpr double r = 1e-11;
     constexpr range_t range {{c.x-r, c.x+r}, {c.y-r, c.y+r}};
-    constexpr int2 res {1280, 1280};
+    constexpr size_t2 res {1280, 1280};
     constexpr size_t max_i = 1e4;
 
     auto *image = new float[res.x*res.y];

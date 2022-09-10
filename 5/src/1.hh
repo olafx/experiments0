@@ -15,16 +15,16 @@ template <typename T>
 struct vec2 { T x, y; };
 
 using double2 = vec2<double>;
-using int2    = vec2<int>;
+using size_t2 = vec2<size_t>;
 using range_t = vec2<double[2]>;
 
 template <int png_color_type, int png_bytes, int png_bit_depth>
-void write_png(const char *const filename, png_byte *const image, const int2 res)
+void write_png(const char *const filename, png_byte *const image, const size_t2 res)
 {
     constexpr bool debug_png = false;
 
     auto check = [](auto *ret_pointer)
-    {   if (retval == NULL)
+    {   if (ret_pointer == NULL)
         {   if constexpr (debug_png)
                 puts("png error");
             exit(EXIT_FAILURE);
@@ -58,7 +58,7 @@ void write_png(const char *const filename, png_byte *const image, const int2 res
 }
 
 template <typename A, nc_type type>
-void write_nc(const char *const filename, A *const image, const int2 res)
+void write_nc(const char *const filename, A *const image, const size_t2 res)
 {
     constexpr bool debug_nc = false;
 
@@ -87,7 +87,7 @@ void write_nc(const char *const filename, A *const image, const int2 res)
 
 // temporary
 template <typename A>
-void color_map_1(const double2 z2, const size_t i, A *const color)
+void color_map_1(const double2 z, const size_t i, A *const color)
 {   color[0] = i/4;
     color[1] = i/4;
     color[2] = i/4;
@@ -95,12 +95,12 @@ void color_map_1(const double2 z2, const size_t i, A *const color)
 
 // temporary
 template <typename A>
-void color_map_2(const double2 z2, const size_t i, A *const color)
+void color_map_2(const double2 z, const size_t i, A *const color)
 {   *color = i;
 }
 
 template <typename A, size_t channels = 1>
-void color_assigner(A *const image, const int2 res, const int2 p, const A *const color)
+void color_assigner(A *const image, const size_t2 res, const size_t2 p, const A *const color)
 {
     for (size_t j = 0; j < channels; j++)
     {   image[channels*(p.y*res.x+p.x)+j] = color[j];
@@ -108,16 +108,16 @@ void color_assigner(A *const image, const int2 res, const int2 p, const A *const
 }
 
 template <size_t max_i, size_t channels = 1, typename image_type, typename A, typename B>
-void render(image_type *image, const range_t range, const int2 res, A &color_mapper, B &color_assigner)
+void render(image_type *image, const range_t range, const size_t2 res, A &color_mapper, B &color_assigner)
 {
-    auto p_to_c = [&](const int2 p)
+    auto p_to_c = [&](const size_t2 p)
     {   return double2 {range.x[0]+(range.x[1]-range.x[0])/res.x*p.x,
                         range.y[0]+(range.y[1]-range.y[0])/res.y*p.y};
     };
 
     #pragma omp parallel for
-    for (int x = 0; x < res.x; x++)
-        for (int y = 0; y < res.y; y++)
+    for (size_t x = 0; x < res.x; x++)
+        for (size_t y = 0; y < res.y; y++)
         {   double2 c = p_to_c({x, y});
             double2 z = {0, 0};
             size_t i;
