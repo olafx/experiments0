@@ -23,8 +23,8 @@ void write_png(const char *const filename, png_byte *const image, const int2 res
 {
     constexpr bool debug_png = false;
 
-    auto check = [](auto retval)
-    {   if (retval == 0)
+    auto check = [](auto *ret_pointer)
+    {   if (retval == NULL)
         {   if constexpr (debug_png)
                 puts("png error");
             exit(EXIT_FAILURE);
