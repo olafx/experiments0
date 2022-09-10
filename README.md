@@ -40,7 +40,7 @@ Fourier and wavelet transformation.
 
 ## 8
 
-Evaluating arbitrary equations to a required precision.
+Various floating point related tools and tests.
 
 ## 9
 
