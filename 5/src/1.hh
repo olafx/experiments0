@@ -2,7 +2,8 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <tuple>
+#include <cmath>
+#include <algorithm>
 
 #include <png.h>
 #include <netcdf.h>
@@ -71,32 +72,39 @@ void write_nc(const char *const filename, A *const image, const size_t2 res)
     };
 
     int id_nc, id_dims[2], id_var;
-    constexpr size_t chunks[2] {128, 128};
-    constexpr unsigned int level = 9; // DEFLATE compression level
+    constexpr size_t chunks[2] {32, 32}; // max szip chunk size
     check(nc_create(filename, NC_CLOBBER|NC_NETCDF4, &id_nc));
     check(nc_set_fill(id_nc, NC_NOFILL, NULL));
     check(nc_def_dim(id_nc, "imag", res.y, id_dims));
     check(nc_def_dim(id_nc, "real", res.x, id_dims+1));
     check(nc_def_var(id_nc, "Mandelbrot", type, 2, id_dims, &id_var));
-    check(nc_def_var_chunking(id_nc, id_var, NC_CHUNKED, chunks));
-    check(nc_def_var_filter(id_nc, id_var, 1 /* DEFLATE */, 1, &level));
+    check(nc_def_var_szip(id_nc, 0, chunks[0], chunks[1]));
     check(nc_enddef(id_nc));
     check(nc_put_var(id_nc, id_var, image));
     check(nc_close(id_nc));
 }
 
-// temporary
-template <typename A>
+// example of RGB coloring
+template <typename A, size_t max_i>
 void color_map_1(const double2 z, const size_t i, A *const color)
-{   color[0] = i/4;
-    color[1] = i/4;
-    color[2] = i/4;
+{   double log1p_i = log1p(i);
+    static double max_log1p_i = log1p(max_i); // log1p isn't marked constexpr
+    color[0] = 0xFF;
+    color[1] = log1p_i/max_log1p_i*0xFF;
+    color[2] = 0x80;
 }
 
-// temporary
+// example of gray coloring
 template <typename A>
 void color_map_2(const double2 z, const size_t i, A *const color)
 {   *color = i;
+}
+
+// example of continuous gray coloring
+template <typename A, size_t max_i>
+void color_map_3(const double2 z, const size_t i, A *const color)
+{   constexpr double r = 2;
+    *color = i == max_i ? max_i : i-log2(.5*log(z.x*z.x+z.y*z.y)/log(r));
 }
 
 template <typename A, size_t channels = 1>
@@ -115,13 +123,15 @@ void render(image_type *image, const range_t range, const size_t2 res, A &color_
                         range.y[0]+(range.y[1]-range.y[0])/res.y*p.y};
     };
 
+    constexpr double r2 = 4;
+
     #pragma omp parallel for
     for (size_t x = 0; x < res.x; x++)
         for (size_t y = 0; y < res.y; y++)
         {   double2 c = p_to_c({x, y});
             double2 z = {0, 0};
             size_t i;
-            for (i = 0; i < max_i && z.x*z.x+z.y*z.y <= 4; i++)
+            for (i = 0; i < max_i && z.x*z.x+z.y*z.y <= r2; i++)
             {   double a = z.x*z.x-z.y*z.y+c.x;
                 z.y = 2*z.x*z.y+c.y;
                 z.x = a;

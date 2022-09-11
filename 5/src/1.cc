@@ -11,35 +11,29 @@ int main()
 {
     using namespace Mandelbrot;
 
-    {
     constexpr range_t range {{-2, 1}, {-1, 1}}; // -2 to 1, -i to i
     constexpr size_t2 res {3840, 2560};
     constexpr size_t max_i = 1e3;
-    constexpr int color_type = PNG_COLOR_TYPE_RGB;
+
+    {
     constexpr int bytes = 3;
     constexpr int bit_depth = 8;
     constexpr size_t channels = 3;
 
     auto *image = new png_byte[channels*res.x*res.y];
-    auto map = color_map_1<png_byte>;
+    auto mapper = color_map_1<png_byte, max_i>;
     auto assigner = color_assigner<png_byte, channels>;
-    render<max_i, channels>(image, range, res, map, assigner);
-    write_png<color_type, bytes, bit_depth>("a.png", image, res);
+    render<max_i, channels>(image, range, res, mapper, assigner);
+    write_png<PNG_COLOR_TYPE_RGB, bytes, bit_depth>("out/a.png", image, res);
     delete[] image;
     }
 
     {
-    constexpr double2 c {0.001643721971153, -0.822467633298876};
-    constexpr double r = 1e-11;
-    constexpr range_t range {{c.x-r, c.x+r}, {c.y-r, c.y+r}};
-    constexpr size_t2 res {1280, 1280};
-    constexpr size_t max_i = 1e4;
-
     auto *image = new float[res.x*res.y];
-    auto map = color_map_2<float>;
+    auto mapper = color_map_3<float, max_i>;
     auto assigner = color_assigner<float>;
-    render<max_i>(image, range, res, map, assigner);
-    write_nc<float, NC_FLOAT>("b.nc", image, res);
+    render<max_i>(image, range, res, mapper, assigner);
+    write_nc<float, NC_FLOAT>("out/b.nc", image, res);
     delete[] image;
     }
 }
