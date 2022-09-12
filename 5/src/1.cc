@@ -24,7 +24,7 @@ int main()
     auto mapper = color_map_1<png_byte, max_i>;
     auto assigner = color_assigner<png_byte, channels>;
     render<max_i, channels>(image, range, res, mapper, assigner);
-    write_png<PNG_COLOR_TYPE_RGB, bytes, bit_depth>("out/a.png", image, res);
+    write_png<PNG_COLOR_TYPE_RGB, bytes, bit_depth>("Mandelbrot.png", image, res);
     delete[] image;
     }
 
@@ -33,7 +33,7 @@ int main()
     auto mapper = color_map_3<float, max_i>;
     auto assigner = color_assigner<float>;
     render<max_i>(image, range, res, mapper, assigner);
-    write_nc<float, NC_FLOAT>("out/b.nc", image, res);
+    write_nc<float, NC_FLOAT>("Mandelbrot.nc", image, res);
     delete[] image;
     }
 }

@@ -48,4 +48,4 @@ ax[1].plot(range_r, (0, 0), c='red', lw=.5)
 ax[1].plot(r, l, c='black', lw=.5)
 
 plt.tight_layout()
-plt.savefig('full.png', dpi=300, bbox_inches='tight')
+plt.savefig('bifurcation.png', dpi=300, bbox_inches='tight')
