@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 
     /*
     Now that the number of primes in [0, d] is known, we can store them all.
-    They will be used in the next sieves, as will explained below.
+    They will be used in the next sieves, as will be explained below.
     */
     size_t n1 = n+sieve[d-2];
     auto *prime = new size_t[n1];
@@ -214,8 +214,8 @@ int main(int argc, char **argv)
         if (sieve[i])
             n++;
 
+    printf("%zu\n", n);
+
     delete[] sieve;
     delete[] prime;
-
-    printf("%zu\n", n);
 }
