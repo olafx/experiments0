@@ -115,7 +115,7 @@ bool brent(double &root, const double x1, const double x2, const double dx, cons
         if (abs(d) > dx1)
             b += d;
         else
-            b += abs(dx1)*(xm < 0 ? -1 : 1);
+            b += xm < 0 ? -abs(dx1) : abs(dx1);
         fb = f(b);
     }
     return false;
@@ -182,4 +182,7 @@ int main()
         else
             printf("  failure\n");
     }
+
+    delete[] roots;
+    delete[] success;
 }

@@ -1,5 +1,5 @@
 /*
-Render 3D Lyanupov fractals of arbitrary iteration sequence. Data is written
+Render 3D Lyapunov fractals of arbitrary iteration sequence. Data is written
 to a compressed netcdf file. So this is a cubic grid file; not 3D in the sense
 of having a value at every 2D point, but 3D as in the sense of having a value at
 every 3D point. This can't be rendered easily. Need to use opacity to cut off
@@ -16,6 +16,8 @@ The netcdf files can also easily be opened in Paraview.
 
 int main()
 {
+    // filename
+    constexpr char filename[] = "Lyapunov ABABC.nc";
     // 3D resolution
     constexpr size_t res_A = 512;
     constexpr size_t res_B = 512;
@@ -24,18 +26,15 @@ int main()
     constexpr float lim_A[2] {3, 4};
     constexpr float lim_B[2] {3, 4};
     constexpr float lim_C[2] {3, 4};
+    // iteration sequence length, e.g. ABC is a length 3 sequence
+    constexpr size_t seq_l = 5;
+    // define the sequence
+    enum r_t {A, B, C};
+    constexpr r_t seq[seq_l] {A, B, A, B, C};
     // number of sequence iterations, e.g. ABCABC is 2 sequence iterations
     constexpr size_t n_seq_i = 1000;
     // initial condition in logistic map
     constexpr float x0 = .1;
-    // iteration sequence length, e.g. ABC is a length 3 sequence
-    constexpr size_t seq_l = 5;
-    // filename
-    constexpr char filename[] = "Lyapunov ABABC.nc";
-
-    // define the sequence
-    enum r_t {A, B, C};
-    constexpr r_t seq[seq_l] {A, B, A, B, C};
 
     // allocating and zero initializing Lyapunov exponents
     auto *l = new float[res_A*res_B*res_C] {};
@@ -64,7 +63,9 @@ int main()
     for (size_t a = 0; a < res_A; a++)
         for (size_t b = 0; b < res_B; b++)
             for (size_t c = 0; c < res_C; c++)
-                l[a*res_B+b] /= n_seq_i*seq_l;
+            {   size_t j = res_C*(res_B*a+b)+c;
+                l[j] /= n_seq_i*seq_l;
+            }
 
     // check for netcdf errors
     auto check = [](int retval)

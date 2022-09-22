@@ -12,8 +12,8 @@ arbitrary nonlinear functions. (Of course the roots are just those of the
 polynomials combined with those of the modulator, but the solver doesn't know
 that.)
 
-g(x)   = c5 x^5 + ... + c0
-f(x)   = sin(0.1x) g(x)
+g(x) = c5 x^5 + ... + c0
+f(x) = sin(0.1x) g(x)
 
 The first and second derivatives of f are trivial, they depend on those of g:
 
@@ -149,4 +149,7 @@ int main()
         else
             printf("  failure\n");
     }
+
+    delete[] roots;
+    delete[] success;
 }
