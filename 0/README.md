@@ -85,3 +85,4 @@ An n-body gravity solver has 2 basic components: a force evaluator, and an integ
             -   DSKD and SDKD techniques by Quinn, Katz, Stadel, Lake (1997)
         -   mechanisms
             -   dynamical time via enclosed density
+
