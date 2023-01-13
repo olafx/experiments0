@@ -44,8 +44,9 @@ Various floating point related tools and tests.
 
 ## 9
 
-Prime sieves.
+Numerical number theory.
 
 ## 10
 
 Optics-related plots.
+
