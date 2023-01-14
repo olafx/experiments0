@@ -1,4 +1,8 @@
-# elliptical 2-body initial condition, starting at apoapsis, in 0-momentum frame
+'''
+Elliptical 2-body initial condition, starting at apoapsis, in 0-momentum frame.
+
+<filename> <orbital eccentricity> <orbit semi major radius>
+'''
 
 import sys
 import numpy as np

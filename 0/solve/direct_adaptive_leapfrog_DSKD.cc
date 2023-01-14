@@ -189,7 +189,9 @@ int main(int argc, char **argv)
 
     // drift operator, applied to all layers
     auto drift = [&](const double dt, const double a = .5)
-    {   for (size_t i = 0; i < n; i++)
+    {
+        #pragma omp parallel for
+        for (size_t i = 0; i < n; i++)
         {   data_p[3*i  ] += a*data_v[3*i  ]*dt;
             data_p[3*i+1] += a*data_v[3*i+1]*dt;
             data_p[3*i+2] += a*data_v[3*i+2]*dt;
@@ -198,7 +200,9 @@ int main(int argc, char **argv)
 
     // kick operator, applied to layer l
     auto kick = [&](const layer_type l, const double dt, const double a = 1)
-    {   for (size_t i = 0; i < n; i++)
+    {
+        #pragma omp parallel for
+        for (size_t i = 0; i < n; i++)
             if (data_layer[i] == l)
             {   double a1 = 0;
                 double a2 = 0;

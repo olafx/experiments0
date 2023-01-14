@@ -1,35 +1,28 @@
-# sampling of King model by King (1966)
+'''
+Sampling of King model by King (1966).
 
-# TODO check math, not 100% sure it's correct
-# TODO sampling is definitely incorrect, see comment
-# TODO it's too slow, idk why, either the interpolator or sampling is slow.
-#      in case it's sampling, easy enough to fix, just make it batched.
-#      in case it's interpolator, speed it up a bit by removing the part after
-#      r0. can also speed it up by doing a spline interpolation on fewer points,
-#      but then evaluating r0 isn't obvious anymore. another point of
-#      optimization is that V_interp is ran twice while result can be saved in
-#      between. another possible reason is that im writing r and v in a weird
-#      order, it'd be better to make r_v a (n, 2) instead of (2, n). so many
-#      many points of optimization. 1 million objects sampled per minute would
-#      be acceptable. right now it's maybe 20k.
-# TODO I think you should use a different type of interpolation, and then solve
-#      r0 numerically. this is more elegant imo. this should just boil down to
-#      a nonlinear equation root finder, which is something I don't do much, but
-#      scipy or numpy can definitely easily do.
+The parameter names follow King (1966).
+
+<filename> <number of objects> <interpolation resolution> <k> <j> <V0> <r_max>
+<required effective interpolation resolution>
+'''
+
+# TODO: Not 100% sure the distribution is right.
+# TODO: It's slow.
+# TODO: The program should be smart and not require r_max or threshold_steps_to_boundary.
 
 import sys
 import numpy as np
 from scipy import special, integrate, interpolate
 import h5py
+import matplotlib.pyplot as plt
 
 if (len(sys.argv) != 9):
     raise Exception('wrong number of command-line arguments')
 
 filename = sys.argv[1]
-n        = int(sys.argv[2]) # objects
-N        = int(sys.argv[3]) # interpolation resolution
-
-# King (1966) parameters
+n  = int(sys.argv[2]) # objects
+N  = int(sys.argv[3]) # interpolation resolution
 k  = float(sys.argv[4])
 j  = float(sys.argv[5])
 V0 = float(sys.argv[6])
@@ -62,16 +55,21 @@ if i == N:
 if i < threshold_steps_to_boundary:
     raise Exception('steps to boundary too small; reduce r_max and/or increase N')
 
+print(f'effective interpolation resolution {i}')
+
 # calculate boundary r0, is simple due to linear interpolation
 r0 = sol.t[i-1]-sol.y[0,i-1]*r_max/N/(sol.y[0,i]-sol.y[0,i-1])
+
+# other ranges needed for rejection sampling
+v_max = np.sqrt(-2*V0)
+pdf_max = 1*np.e**-2
 
 # standard rejection sampling
 i = 0
 while i < n:
     r = rng.uniform(0, r0)
-    # TODO v is wrong here, need to use analytical max v
-    v = rng.uniform(0, np.sqrt(-2*V_interp(r)))
-    p = rng.uniform(0, 1/np.e**2)
+    v = rng.uniform(0, v_max)
+    p = rng.uniform(0, pdf_max)
     if p < r**2*v**2*np.exp(-2*j**2*(V_interp(r)-V0))*(np.exp(-j**2*v**2)-np.exp(j**2*2*V_interp(r))):
         r_v[:,i] = r, v
         i += 1
@@ -87,8 +85,13 @@ def spherical_to_Cartesian(r, theta, phi):
                      r*np.sin(theta)*np.sin(phi),
                      r*np.cos(theta)])
 
+# isentropic spherical to Cartesian conversion
 pos_vel[0] = np.transpose(spherical_to_Cartesian(r_v[0], r_theta, r_phi))
 pos_vel[1] = np.transpose(spherical_to_Cartesian(r_v[1], v_theta, v_phi))
+
+# bring to 0-momentum frame
+for i in range(3):
+    pos_vel[1,:,i] -= np.sum(pos_vel[1,:,i])/n
 
 # writing
 fp = h5py.File(filename, 'w')
