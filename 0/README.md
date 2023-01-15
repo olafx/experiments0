@@ -23,11 +23,13 @@ A new dataset 'time' is contained in root. This is an extendible array of length
 The initial conditions are generated using Python scripts.
 
 -   2-body elliptical
-    -   in 0-momentum frame
+    -   from analytical orbital mechanics
 -   Plummer model
     -   via standard rejection sampling
 -   King model
     -   via standard rejection sampling
+
+(All in 0-momentum frame.)
 
 ## Analysis
 
@@ -35,15 +37,16 @@ Some rudimentary analysis is done here using Python scripts. The full n-body ana
 
 -   2-body
     -   min/max distance
-    -   max total velocity
-    -   max normalized total energy error
+    -   min/max total velocity
+    -   min/max total energy
+    -   (plot) potential and kinetic energy
+    -   (plot) total energy
     -   (plot) distance
-    -   (plot) potential energy
-    -   (plot) normalized total energy
 -   n-body
-    -   max velocity
-    -   (plot) kinetic energy
     -   (plot) total velocity
+    -   (plot) total kinetic energy
+    -   (plot) density profile
+    -   (plot) a few trajectories
 
 ## Solvers
 
