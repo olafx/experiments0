@@ -1,7 +1,24 @@
+'''
+Analysis of 2-body solution.
+
+<filename>
+'''
+
 import sys
+import os
 import numpy as np
 import h5py
 import matplotlib.pyplot as plt
+
+SAVE_FIGS         = True
+PLOT_ENERGY       = True
+PLOT_TOTAL_ENERGY = True
+PLOT_DISTANCE     = True
+
+def save_fig(name: str):
+    plt.savefig(os.path.splitext(filename)[0]+'_'+name, format='png', dpi=400)
+
+PLOT_ANYTHING = PLOT_ENERGY or PLOT_TOTAL_VELOCITY or PLOT_DISTANCE
 
 filename = sys.argv[1]
 
@@ -38,30 +55,42 @@ print(f'max total vel {total_vel_max:.2e}')
 print(f'min total energy {energy_min:.2e}')
 print(f'max total energy {energy_max:.2e}')
 
-plt.figure('energy')
-plt.xlabel('time [a.u.]')
-plt.ylabel('energy [a.u.]')
-plt.plot(time, pot_energy, 'r', label='potential')
-plt.plot(time, kin_energy, 'b', label='kinetic')
-plt.xlim(time[0], time[-1])
-plt.grid()
-plt.legend()
-plt.tight_layout()
+plt.rcParams['text.usetex'] = True
 
-plt.figure('total energy')
-plt.xlabel('time [a.u.]')
-plt.ylabel('total energy [a.u.]')
-plt.plot(time, energy, 'k')
-plt.xlim(time[0], time[-1])
-plt.grid()
-plt.tight_layout()
+if PLOT_ENERGY:
+    plt.figure('energy')
+    plt.xlabel('time $t$ [a.u.]')
+    plt.ylabel('energy [a.u.]')
+    plt.plot(time, pot_energy, 'r', label='potential energy $V$')
+    plt.plot(time, kin_energy, 'b', label='kinetic energy $T$')
+    plt.xlim(time[0], time[-1])
+    plt.grid()
+    plt.legend()
+    plt.tight_layout()
+    if SAVE_FIGS:
+        save_fig('energy')
 
-plt.figure('distance')
-plt.xlabel('time [a.u.]')
-plt.ylabel('distance [a.u.]')
-plt.plot(time, dist, 'k')
-plt.xlim(time[0], time[-1])
-plt.grid()
-plt.tight_layout()
+if PLOT_TOTAL_ENERGY:
+    plt.figure('total energy')
+    plt.xlabel('time $t$ [a.u.]')
+    plt.ylabel('total energy $E$ [a.u.]')
+    plt.plot(time, energy, 'k')
+    plt.xlim(time[0], time[-1])
+    plt.grid()
+    plt.tight_layout()
+    if SAVE_FIGS:
+        save_fig('total_energy')
 
-plt.show()
+if PLOT_DISTANCE:
+    plt.figure('distance')
+    plt.xlabel('time $t$ [a.u.]')
+    plt.ylabel('distance $d$ [a.u.]')
+    plt.plot(time, dist, 'k')
+    plt.xlim(time[0], time[-1])
+    plt.grid()
+    plt.tight_layout()
+    if SAVE_FIGS:
+        save_fig('distance')
+
+if PLOT_ANYTHING and not SAVE_FIGS:
+    plt.show()
