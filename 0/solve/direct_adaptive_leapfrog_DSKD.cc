@@ -228,6 +228,7 @@ int main(int argc, char **argv)
     // select operator, applying multiple times defines the layers
     auto select = [&](const layer_type l, const double dt)
     {   // select as of yet unselected objects that belong to layer l
+        #pragma omp parallel for
         for (size_t i = 0; i < n; i++)
             if (data_layer[i] == 0 && dyn_time(i) > dt)
                 data_layer[i] = l;
