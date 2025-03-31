@@ -2,8 +2,6 @@
 
 Numerical experiments.
 
-Everything is copyrighted, but only because there is insufficient explanation, to avoid copying and not understanding. Copyright does not apply to ideas.
-
 Not everything is cited, but where papers are implemented, they are.
 
 ## 0
